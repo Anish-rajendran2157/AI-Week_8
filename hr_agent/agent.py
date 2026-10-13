@@ -66,12 +66,14 @@ def run_agent(question: str, budget: Budget = None) -> dict:
     used = {**zero, "backoff_s": 0.0}
     last = dict(zero)
     tool_trace = []
+    trajectory = []  # every tool call with its raw arguments and result, for the trajectory eval
     laps = 0
     log.info("START question=%r budget=%s", question, asdict(budget))
 
     def finish(status, answer=None):
         wall = time.perf_counter() - start
         result = {"status": status, "answer": answer, "laps": laps, "tool_calls": tool_trace,
+                  "trajectory": trajectory,
                   **{k: used[k] for k in zero}, "backoff_s": used["backoff_s"],
                   "latency_s": wall - used["backoff_s"]}
         log.info("END status=%s laps=%d tokens=%d cost=$%.6f latency=%.2fs",
@@ -111,6 +113,7 @@ def run_agent(question: str, budget: Budget = None) -> dict:
         for tc in msg.tool_calls:
             result = call_tool(tc.function.name, tc.function.arguments)
             tool_trace.append(f"{tc.function.name}({tc.function.arguments})")
+            trajectory.append({"tool": tc.function.name, "arguments": tc.function.arguments, "result": result})
             log.info("lap %d: tool %s(%s)", laps, tc.function.name, tc.function.arguments)
             messages.append({"role": "tool", "tool_call_id": tc.id, "content": json.dumps(result)})
 
