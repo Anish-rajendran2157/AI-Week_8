@@ -1,0 +1,84 @@
+diff --git a/hr_agent/agent.py b/hr_agent/agent.py
+index d55cd88..c553b11 100644
+--- a/hr_agent/agent.py
++++ b/hr_agent/agent.py
+@@ -31,6 +31,47 @@ class Budget:
+     max_wall_s: float = 90.0
+ 
+ 
++# Re-planning check (Week 8 mitigation for skipped_clause). Before an answer is accepted, record facts
++# that a handbook clause adjusts are compared with the clauses actually retrieved; if one is missing,
++# the answer is refused once and the model is told to re-plan. MAX_REPLANS bounds the extra laps.
++MAX_REPLANS = 1
++REPLAN_MESSAGE = ("Re-plan before answering. The employee record shows {facts}; handbook clause(s) {clauses} "
++                  "define how that changes the entitlement, and you have not retrieved them. Retrieve them "
++                  "with search_handbook, then give the final JSON answer again.")
++_TOPIC_BY_RULE = {"-AL-": "annual_leave", "-NP-": "notice_period", "-SL-": "sick_leave"}
++
++
++def _unread_clauses(trajectory, answer) -> list:
++    """[(clause, why)] for record facts a handbook clause adjusts whose clause was never retrieved."""
++    records = [c["result"] for c in trajectory
++               if c["tool"] == "get_employee_record" and isinstance(c["result"], dict) and "error" not in c["result"]]
++    if not records:
++        return []
++    rec = records[-1]
++    topics = set()
++    for c in trajectory:
++        if c["tool"] == "get_jurisdiction_rules":
++            try:
++                topics.add(json.loads(c["arguments"] or "{}").get("topic"))
++            except (json.JSONDecodeError, AttributeError):
++                pass
++    rule_id = str((answer or {}).get("rule_id", ""))
++    topics |= {t for marker, t in _TOPIC_BY_RULE.items() if marker in rule_id}
++    read = {s["section"].split(" ")[0] for c in trajectory
++            if c["tool"] == "search_handbook" and isinstance(c["result"], list) for s in c["result"]}
++
++    needed = []
++    if rec.get("transfer"):
++        needed.append(("HB-2", f"a transfer to {rec['transfer'].get('to_jurisdiction')}"))
++    if rec.get("employment_type") == "contractor":
++        needed.append(("HB-3", "employment_type=contractor"))
++    if rec.get("carry_over_days", 0) > 0 and "annual_leave" in topics:
++        needed.append(("HB-4", f"carry_over_days={rec['carry_over_days']}"))
++    if rec.get("employment_type") == "part-time" and topics & {"annual_leave", "sick_leave"}:
++        needed.append(("HB-6", f"part-time, fte={rec.get('fte')}"))
++    return [(clause, why) for clause, why in needed if clause not in read]
++
++
+ def _assistant_message(msg) -> dict:
+     out = {"role": "assistant", "content": msg.content or ""}
+     if msg.tool_calls:
+@@ -67,13 +108,14 @@ def run_agent(question: str, budget: Budget = None) -> dict:
+     last = dict(zero)
+     tool_trace = []
+     trajectory = []  # every tool call with its raw arguments and result, for the trajectory eval
++    replans = 0
+     laps = 0
+     log.info("START question=%r budget=%s", question, asdict(budget))
+ 
+     def finish(status, answer=None, error=None):
+         wall = time.perf_counter() - start
+         result = {"status": status, "answer": answer, "laps": laps, "tool_calls": tool_trace,
+-                  "trajectory": trajectory, "error": error,
++                  "trajectory": trajectory, "error": error, "replans": replans,
+                   **{k: used[k] for k in zero}, "backoff_s": used["backoff_s"],
+                   "latency_s": wall - used["backoff_s"]}
+         log.info("END status=%s laps=%d tokens=%d cost=$%.6f latency=%.2fs",
+@@ -108,6 +150,15 @@ def run_agent(question: str, budget: Budget = None) -> dict:
+ 
+         if not msg.tool_calls:
+             answer = parse_answer(msg.content)
++            unread = _unread_clauses(trajectory, answer) if replans < MAX_REPLANS else []
++            if unread:
++                replans += 1
++                facts = "; ".join(why for _, why in unread)
++                clauses = ", ".join(c for c, _ in unread)
++                log.info("lap %d: RE-PLAN: answer depends on %s but clause(s) %s were never retrieved",
++                         laps, facts, clauses)
++                messages.append({"role": "user", "content": REPLAN_MESSAGE.format(facts=facts, clauses=clauses)})
++                continue
+             return finish("ok" if answer else "bad_output", answer)
+ 
+         for tc in msg.tool_calls:

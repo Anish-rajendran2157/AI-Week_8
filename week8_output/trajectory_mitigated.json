@@ -1,0 +1,483 @@
+{
+ "summary": {
+  "runs": 13,
+  "outcome_pass_rate": 1.0,
+  "trajectory_pass_rate": 1.0,
+  "gap": 0.0,
+  "tool_choice_accuracy": 1.0,
+  "argument_validity": 1.0,
+  "step_efficiency_mean": 1.1153846153846154,
+  "step_efficiency_max": 1.5,
+  "cost_p50_usd": 0.00019424999999999998,
+  "cost_max_usd": 0.00038077499999999997,
+  "cost_mean_usd": 0.00024557884615384614,
+  "tokens_p50": 2151,
+  "tokens_max": 4231,
+  "latency_p50_s": 2.581219899991993,
+  "latency_max_s": 10.457258100039326,
+  "right_answer_wrong_path": 0,
+  "mode_counts": {
+   "skipped_record": 0,
+   "skipped_clause": 0,
+   "wrong_argument": 0,
+   "invented_argument": 0,
+   "unsupported_citation": 0,
+   "redundant_call": 0,
+   "order_violation": 0,
+   "malformed_tool_call": 0,
+   "no_answer": 0,
+   "wrong_answer": 0
+  }
+ },
+ "runs": [
+  {
+   "case": "C01",
+   "status": "ok",
+   "value": 5.0,
+   "expected": 5,
+   "rule_id": "US-SL-1",
+   "outcome_pass": true,
+   "trajectory_pass": true,
+   "tool_choice_ok": true,
+   "args_valid": 3,
+   "args_total": 3,
+   "steps": 2,
+   "steps_needed": 2,
+   "step_efficiency": 1.0,
+   "modes": [],
+   "cost_usd": 0.000193725,
+   "total_tokens": 2118,
+   "latency_s": 2.4080914999940433,
+   "laps": 3,
+   "error": null,
+   "path": [
+    "get_employee_record({\"employee_id\":\"E106\"})",
+    "get_jurisdiction_rules({\"jurisdiction\":\"US-CA\",\"topic\":\"sick_leave\"})"
+   ],
+   "repeat": 1
+  },
+  {
+   "case": "C01",
+   "status": "ok",
+   "value": 5.0,
+   "expected": 5,
+   "rule_id": "US-SL-1",
+   "outcome_pass": true,
+   "trajectory_pass": true,
+   "tool_choice_ok": true,
+   "args_valid": 3,
+   "args_total": 3,
+   "steps": 2,
+   "steps_needed": 2,
+   "step_efficiency": 1.0,
+   "modes": [],
+   "cost_usd": 0.000193725,
+   "total_tokens": 2118,
+   "latency_s": 1.8903049000073224,
+   "laps": 3,
+   "error": null,
+   "path": [
+    "get_employee_record({\"employee_id\":\"E106\"})",
+    "get_jurisdiction_rules({\"jurisdiction\":\"US-CA\",\"topic\":\"sick_leave\"})"
+   ],
+   "repeat": 2
+  },
+  {
+   "case": "C02",
+   "status": "ok",
+   "value": 30.0,
+   "expected": 30,
+   "rule_id": "IN-NP-2",
+   "outcome_pass": true,
+   "trajectory_pass": true,
+   "tool_choice_ok": true,
+   "args_valid": 3,
+   "args_total": 3,
+   "steps": 2,
+   "steps_needed": 2,
+   "step_efficiency": 1.0,
+   "modes": [],
+   "cost_usd": 0.00019267499999999995,
+   "total_tokens": 2149,
+   "latency_s": 2.116699800011702,
+   "laps": 3,
+   "error": null,
+   "path": [
+    "get_employee_record({\"employee_id\":\"E101\"})",
+    "get_jurisdiction_rules({\"jurisdiction\":\"IN\",\"topic\":\"notice_period\"})"
+   ],
+   "repeat": 1
+  },
+  {
+   "case": "C02",
+   "status": "ok",
+   "value": 30.0,
+   "expected": 30,
+   "rule_id": "IN-NP-2",
+   "outcome_pass": true,
+   "trajectory_pass": true,
+   "tool_choice_ok": true,
+   "args_valid": 3,
+   "args_total": 3,
+   "steps": 2,
+   "steps_needed": 2,
+   "step_efficiency": 1.0,
+   "modes": [],
+   "cost_usd": 0.00019327499999999997,
+   "total_tokens": 2151,
+   "latency_s": 2.7504808999947272,
+   "laps": 3,
+   "error": null,
+   "path": [
+    "get_employee_record({\"employee_id\":\"E101\"})",
+    "get_jurisdiction_rules({\"jurisdiction\":\"IN\",\"topic\":\"notice_period\"})"
+   ],
+   "repeat": 2
+  },
+  {
+   "case": "C03",
+   "status": "ok",
+   "value": 28.0,
+   "expected": 28,
+   "rule_id": "UK-NP-1",
+   "outcome_pass": true,
+   "trajectory_pass": true,
+   "tool_choice_ok": true,
+   "args_valid": 4,
+   "args_total": 4,
+   "steps": 3,
+   "steps_needed": 2,
+   "step_efficiency": 1.5,
+   "modes": [],
+   "cost_usd": 0.00028305,
+   "total_tokens": 3258,
+   "latency_s": 2.9547696000081487,
+   "laps": 4,
+   "error": null,
+   "path": [
+    "get_employee_record({\"employee_id\":\"E103\"})",
+    "search_handbook({\"query\":\"notice period UK tenure\"})",
+    "get_jurisdiction_rules({\"jurisdiction\":\"UK\",\"topic\":\"notice_period\"})"
+   ],
+   "repeat": 1
+  },
+  {
+   "case": "C03",
+   "status": "ok",
+   "value": 28.0,
+   "expected": 28,
+   "rule_id": "UK-NP-1",
+   "outcome_pass": true,
+   "trajectory_pass": true,
+   "tool_choice_ok": true,
+   "args_valid": 4,
+   "args_total": 4,
+   "steps": 3,
+   "steps_needed": 2,
+   "step_efficiency": 1.5,
+   "modes": [],
+   "cost_usd": 0.00028305,
+   "total_tokens": 3258,
+   "latency_s": 3.1569011000101455,
+   "laps": 4,
+   "error": null,
+   "path": [
+    "get_employee_record({\"employee_id\":\"E103\"})",
+    "search_handbook({\"query\":\"notice period UK tenure\"})",
+    "get_jurisdiction_rules({\"jurisdiction\":\"UK\",\"topic\":\"notice_period\"})"
+   ],
+   "repeat": 2
+  },
+  {
+   "case": "C04",
+   "status": "ok",
+   "value": 17.0,
+   "expected": 17,
+   "rule_id": "IN-AL-3",
+   "outcome_pass": true,
+   "trajectory_pass": true,
+   "tool_choice_ok": true,
+   "args_valid": 4,
+   "args_total": 4,
+   "steps": 3,
+   "steps_needed": 3,
+   "step_efficiency": 1.0,
+   "modes": [],
+   "cost_usd": 0.00038077499999999997,
+   "total_tokens": 4231,
+   "latency_s": 5.221092700026929,
+   "laps": 5,
+   "error": null,
+   "path": [
+    "get_employee_record({\"employee_id\":\"E102\"})",
+    "get_jurisdiction_rules({\"jurisdiction\":\"IN\",\"topic\":\"annual_leave\"})",
+    "search_handbook({\"query\":\"HB-4 carry-over\"})"
+   ],
+   "repeat": 1
+  },
+  {
+   "case": "C05",
+   "status": "ok",
+   "value": 10.0,
+   "expected": 10,
+   "rule_id": "UK-SL-1",
+   "outcome_pass": true,
+   "trajectory_pass": true,
+   "tool_choice_ok": true,
+   "args_valid": 4,
+   "args_total": 4,
+   "steps": 3,
+   "steps_needed": 2,
+   "step_efficiency": 1.5,
+   "modes": [],
+   "cost_usd": 0.00028185,
+   "total_tokens": 3206,
+   "latency_s": 10.457258100039326,
+   "laps": 4,
+   "error": null,
+   "path": [
+    "get_employee_record({\"employee_id\":\"E103\"})",
+    "search_handbook({\"query\":\"UK sick leave entitlement\"})",
+    "get_jurisdiction_rules({\"jurisdiction\":\"UK\",\"topic\":\"sick_leave\"})"
+   ],
+   "repeat": 1
+  },
+  {
+   "case": "C06",
+   "status": "ok",
+   "value": 0.0,
+   "expected": 0,
+   "rule_id": "SG-SL-1",
+   "outcome_pass": true,
+   "trajectory_pass": true,
+   "tool_choice_ok": true,
+   "args_valid": 3,
+   "args_total": 3,
+   "steps": 2,
+   "steps_needed": 2,
+   "step_efficiency": 1.0,
+   "modes": [],
+   "cost_usd": 0.00019095,
+   "total_tokens": 2114,
+   "latency_s": 1.7349405999993905,
+   "laps": 3,
+   "error": null,
+   "path": [
+    "get_employee_record({\"employee_id\":\"E107\"})",
+    "get_jurisdiction_rules({\"jurisdiction\":\"SG\",\"topic\":\"sick_leave\"})"
+   ],
+   "repeat": 1
+  },
+  {
+   "case": "C07",
+   "status": "ok",
+   "value": 10.0,
+   "expected": 10,
+   "rule_id": "US-AL-1",
+   "outcome_pass": true,
+   "trajectory_pass": true,
+   "tool_choice_ok": true,
+   "args_valid": 3,
+   "args_total": 3,
+   "steps": 2,
+   "steps_needed": 2,
+   "step_efficiency": 1.0,
+   "modes": [],
+   "cost_usd": 0.00019424999999999998,
+   "total_tokens": 2143,
+   "latency_s": 2.0027828000020236,
+   "laps": 3,
+   "error": null,
+   "path": [
+    "get_employee_record({\"employee_id\":\"E105\"})",
+    "get_jurisdiction_rules({\"jurisdiction\":\"US-CA\",\"topic\":\"annual_leave\"})"
+   ],
+   "repeat": 1
+  },
+  {
+   "case": "C08",
+   "status": "ok",
+   "value": 16.5,
+   "expected": 16.5,
+   "rule_id": "UK-AL-2",
+   "outcome_pass": true,
+   "trajectory_pass": true,
+   "tool_choice_ok": true,
+   "args_valid": 4,
+   "args_total": 4,
+   "steps": 3,
+   "steps_needed": 3,
+   "step_efficiency": 1.0,
+   "modes": [],
+   "cost_usd": 0.000295875,
+   "total_tokens": 3261,
+   "latency_s": 3.99644250003621,
+   "laps": 4,
+   "error": null,
+   "path": [
+    "get_employee_record({\"employee_id\":\"E109\"})",
+    "search_handbook({\"query\":\"part-time annual leave UK\"})",
+    "get_jurisdiction_rules({\"jurisdiction\":\"UK\",\"topic\":\"annual_leave\"})"
+   ],
+   "repeat": 1
+  },
+  {
+   "case": "C09",
+   "status": "ok",
+   "value": 28.0,
+   "expected": 28,
+   "rule_id": "UK-NP-2",
+   "outcome_pass": true,
+   "trajectory_pass": true,
+   "tool_choice_ok": true,
+   "args_valid": 4,
+   "args_total": 4,
+   "steps": 3,
+   "steps_needed": 3,
+   "step_efficiency": 1.0,
+   "modes": [],
+   "cost_usd": 0.000318975,
+   "total_tokens": 3431,
+   "latency_s": 2.581219899991993,
+   "laps": 4,
+   "error": null,
+   "path": [
+    "get_employee_record({\"employee_id\":\"E108\"})",
+    "search_handbook({\"query\":\"notice period\"})",
+    "get_jurisdiction_rules({\"jurisdiction\":\"UK\",\"topic\":\"notice_period\"})"
+   ],
+   "repeat": 1
+  },
+  {
+   "case": "C10",
+   "status": "ok",
+   "value": 0.0,
+   "expected": 0,
+   "rule_id": "HB-3",
+   "outcome_pass": true,
+   "trajectory_pass": true,
+   "tool_choice_ok": true,
+   "args_valid": 3,
+   "args_total": 3,
+   "steps": 2,
+   "steps_needed": 2,
+   "step_efficiency": 1.0,
+   "modes": [],
+   "cost_usd": 0.00019035,
+   "total_tokens": 2148,
+   "latency_s": 1.7957514000008814,
+   "laps": 3,
+   "error": null,
+   "path": [
+    "get_employee_record({\"employee_id\":\"E110\"})",
+    "search_handbook({\"query\":\"SG annual leave contractor\"})"
+   ],
+   "repeat": 1
+  }
+ ],
+ "aborted_at": "C04 r2",
+ "excluded_runs": [
+  {
+   "case": "C01",
+   "repeat": 3,
+   "laps": 0,
+   "reason": "Groq free-tier daily token cap (TPD 200k) reached; HTTP 429 retry-after exceeded the 90 s wall-clock budget, so the run never got a model answer"
+  },
+  {
+   "case": "C02",
+   "repeat": 3,
+   "laps": 0,
+   "reason": "Groq free-tier daily token cap (TPD 200k) reached; HTTP 429 retry-after exceeded the 90 s wall-clock budget, so the run never got a model answer"
+  },
+  {
+   "case": "C03",
+   "repeat": 3,
+   "laps": 0,
+   "reason": "Groq free-tier daily token cap (TPD 200k) reached; HTTP 429 retry-after exceeded the 90 s wall-clock budget, so the run never got a model answer"
+  },
+  {
+   "case": "C04",
+   "repeat": 2,
+   "laps": 2,
+   "reason": "Groq free-tier daily token cap (TPD 200k) reached; HTTP 429 retry-after exceeded the 90 s wall-clock budget, so the run never got a model answer"
+  },
+  {
+   "case": "C04",
+   "repeat": 3,
+   "laps": 0,
+   "reason": "Groq free-tier daily token cap (TPD 200k) reached; HTTP 429 retry-after exceeded the 90 s wall-clock budget, so the run never got a model answer"
+  },
+  {
+   "case": "C05",
+   "repeat": 2,
+   "laps": 0,
+   "reason": "Groq free-tier daily token cap (TPD 200k) reached; HTTP 429 retry-after exceeded the 90 s wall-clock budget, so the run never got a model answer"
+  },
+  {
+   "case": "C05",
+   "repeat": 3,
+   "laps": 0,
+   "reason": "Groq free-tier daily token cap (TPD 200k) reached; HTTP 429 retry-after exceeded the 90 s wall-clock budget, so the run never got a model answer"
+  },
+  {
+   "case": "C06",
+   "repeat": 2,
+   "laps": 0,
+   "reason": "Groq free-tier daily token cap (TPD 200k) reached; HTTP 429 retry-after exceeded the 90 s wall-clock budget, so the run never got a model answer"
+  },
+  {
+   "case": "C06",
+   "repeat": 3,
+   "laps": 0,
+   "reason": "Groq free-tier daily token cap (TPD 200k) reached; HTTP 429 retry-after exceeded the 90 s wall-clock budget, so the run never got a model answer"
+  },
+  {
+   "case": "C07",
+   "repeat": 2,
+   "laps": 0,
+   "reason": "Groq free-tier daily token cap (TPD 200k) reached; HTTP 429 retry-after exceeded the 90 s wall-clock budget, so the run never got a model answer"
+  },
+  {
+   "case": "C07",
+   "repeat": 3,
+   "laps": 0,
+   "reason": "Groq free-tier daily token cap (TPD 200k) reached; HTTP 429 retry-after exceeded the 90 s wall-clock budget, so the run never got a model answer"
+  },
+  {
+   "case": "C08",
+   "repeat": 2,
+   "laps": 0,
+   "reason": "Groq free-tier daily token cap (TPD 200k) reached; HTTP 429 retry-after exceeded the 90 s wall-clock budget, so the run never got a model answer"
+  },
+  {
+   "case": "C08",
+   "repeat": 3,
+   "laps": 0,
+   "reason": "Groq free-tier daily token cap (TPD 200k) reached; HTTP 429 retry-after exceeded the 90 s wall-clock budget, so the run never got a model answer"
+  },
+  {
+   "case": "C09",
+   "repeat": 2,
+   "laps": 0,
+   "reason": "Groq free-tier daily token cap (TPD 200k) reached; HTTP 429 retry-after exceeded the 90 s wall-clock budget, so the run never got a model answer"
+  },
+  {
+   "case": "C09",
+   "repeat": 3,
+   "laps": 0,
+   "reason": "Groq free-tier daily token cap (TPD 200k) reached; HTTP 429 retry-after exceeded the 90 s wall-clock budget, so the run never got a model answer"
+  },
+  {
+   "case": "C10",
+   "repeat": 2,
+   "laps": 0,
+   "reason": "Groq free-tier daily token cap (TPD 200k) reached; HTTP 429 retry-after exceeded the 90 s wall-clock budget, so the run never got a model answer"
+  },
+  {
+   "case": "C10",
+   "repeat": 3,
+   "laps": 0,
+   "reason": "Groq free-tier daily token cap (TPD 200k) reached; HTTP 429 retry-after exceeded the 90 s wall-clock budget, so the run never got a model answer"
+  }
+ ]
+}

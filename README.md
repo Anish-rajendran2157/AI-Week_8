@@ -1,4 +1,40 @@
-# AI-Week_7 — HR agent vs fixed workflow
+# AI-Week_8 — trajectory evals for the HR agent
+
+Week 8 · Agent Failure Modes & Trajectory Evals · Task Set C (HR policy). Extends the Week 7 HR
+agent below: score the *path*, not just the answer, expose the outcome-vs-trajectory gap as a
+number, and kill the worst failure mode with its price measured.
+
+Full write-up — expected sequences, numbers, gap trace, mitigation, regression table: **[WEEK8.md](WEEK8.md)**.
+
+## Week 8 results
+
+| metric | baseline (30 runs) |
+|---|---|
+| tool-choice accuracy | 90.0% |
+| argument validity | 100.0% |
+| step efficiency, mean / max | 1.07 / 1.50 |
+| cost per question, p50 / max | $0.000196 / $0.000327 |
+| outcome pass / trajectory pass | 100.0% / 90.0% |
+| **gap** | **+10.0 pts** |
+
+**Right answer, wrong path:** C04 *"How many annual leave days does E102 have left?"* answered 17
+correctly in every run without ever retrieving HB-4, the only clause that defines the carry-over
+balance formula. Path: `get_employee_record -> get_jurisdiction_rules -> answer`.
+
+**One mitigation, re-planning:** before accepting an answer, a check refuses it once if the record
+shows a fact (carry-over, part-time, transfer, contractor) whose handbook clause was never read.
+Top mode `skipped_clause` 1 -> 0, gap +10 -> 0 pts (repeat 1, 10 vs 10 runs). Price on C04:
++2,078 tokens (+97%), +$0.000184 (+93%), +3.1 s; other 9 cases unchanged. No mode regressed.
+A first attempt (tighter tool description) made 3 modes worse and was reverted; see WEEK8.md.
+
+```bash
+python -m hr_agent.trajectory_eval --tag baseline --repeats 3
+python -m hr_agent.trajectory_eval --compare baseline mitigated --repeat 1
+```
+
+---
+
+# Week 7 — HR agent vs fixed workflow
 
 Week 7 · Agent Loops — and When Not to Use Them · Task Set C (HR policy).
 
@@ -10,7 +46,7 @@ with numbers, whether the task needs an agent at all.
 
 Full write-up — race table, budget log, tool diff and verdict: **[WEEK7.md](WEEK7.md)**.
 
-## Results
+## Week 7 results
 
 | system | pass rate | p50 latency (s) | total tokens (10 questions) | cost / question (USD) |
 |---|---|---|---|---|
@@ -25,7 +61,7 @@ that forces an agent is the **cross-jurisdiction transfer**: the jurisdiction wh
 only known after reading the record and the transfer clause, and the fixed workflow fetched the
 wrong one. Ship the workflow; route transfer questions to the agent (or add one transfer branch).
 
-## Run it
+## Run it (Week 7)
 
 ```bash
 pip install -r requirements.txt
@@ -49,7 +85,9 @@ hr_agent/
   tools.py            get_employee_record, search_handbook, get_jurisdiction_rules (enum params)
   contract.py         shared system prompt and output contract (JSON with rule_id + value)
   llm.py              Groq wrapper: per-call tokens, cost, latency, rate-limit backoff, deadline
-  race.py             agent vs workflow over questions.json
+  race.py             agent vs workflow over questions.json (Week 7)
+  trajectory_cases.py the 10 Week 8 cases with accepted tool sequences
+  trajectory_eval.py  Week 8 trajectory scorer, failure modes, regression compare
   budget_demo.py      makes each budget fire once and logs the clean termination
   questions.json      10 questions: single lookup, tenure branches, part-time, transfer, contractor
   data/               employees.json, jurisdiction_rules.json, handbook.md (fictional Northwind)
@@ -58,9 +96,10 @@ week7_output/
   race_runs.csv       per-question value, rule, laps, tokens, latency and tool trace
   budget_termination.log
   tool_description.diff
+week8_output/          trajectory_*.md/.json, regression*.md, mitigation.diff, attempt1_description.diff
 ```
 
-## Deliverables checklist
+## Week 7 deliverables checklist
 
 - [x] Agent and workflow each runnable by one command
 - [x] [race.csv](week7_output/race.csv) with all 8 numbers over the same 10 employee questions
