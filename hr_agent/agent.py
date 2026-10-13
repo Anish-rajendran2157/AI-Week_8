@@ -91,7 +91,7 @@ def run_agent(question: str, budget: Budget = None) -> dict:
             msg, usage = llm.chat(messages, tools=TOOL_SCHEMAS, deadline=deadline)
         except llm.DeadlineExceeded as e:
             log.warning("BUDGET FIRED: wall_clock (%s) -> terminating cleanly during lap %d", e, laps + 1)
-            return finish("budget:wall_clock")
+            return finish("budget:wall_clock", error=str(e))
         except APIError as e:
             log.error("LLM error on lap %d: %s", laps + 1, e)
             return finish("error", error=str(e)[:500])

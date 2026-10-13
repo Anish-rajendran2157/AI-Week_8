@@ -1,7 +1,7 @@
 """Trajectory eval for the HR agent: score the path, not only the answer.
 
 Run:  python -m hr_agent.trajectory_eval --tag baseline            (10 cases x 3 repeats)
-      python -m hr_agent.trajectory_eval --compare baseline mitigated
+      python -m hr_agent.trajectory_eval --compare baseline mitigated [--repeat 1]
 
 Per run it records outcome pass (value correct) and trajectory pass (tool sequence is one of the
 case's accepted paths, every argument is real, and the cited rule was actually retrieved), then
@@ -167,7 +167,7 @@ def summarise(rows) -> dict:
 def render(tag, summary, rows) -> str:
     s = summary
     lines = [f"# Trajectory eval — {tag}", "",
-             f"{s['runs']} runs (10 cases x {s['runs'] // 10} repeats).", "",
+             f"{s['runs']} runs.", "",
              "| metric | value |", "|---|---|",
              f"| outcome pass rate | {s['outcome_pass_rate']:.1%} |",
              f"| trajectory pass rate | {s['trajectory_pass_rate']:.1%} |",
@@ -198,24 +198,44 @@ def run_eval(tag, repeats, only):
             if only and case.id not in only:
                 continue
             run = run_agent(case.question)
+            if "rate-limited" in (run.get("error") or ""):
+                # Provider quota, not agent behaviour: stop rather than score it as a failure.
+                print(f"[{tag}] {case.id} r{rep + 1} ABORTED: provider rate limit ({run['error']}); "
+                      f"{len(rows)} runs scored before the quota ran out")
+                return _write(tag, rows, aborted_at=f"{case.id} r{rep + 1}")
             row = score_run(case, run)
             row["repeat"] = rep + 1
             rows.append(row)
             print(f"[{tag}] {case.id} r{rep + 1} outcome={'PASS' if row['outcome_pass'] else 'FAIL'} "
                   f"trajectory={'PASS' if row['trajectory_pass'] else 'FAIL'} modes={row['modes']} "
                   f"steps={row['steps']} cost=${row['cost_usd']:.6f}")
+    return _write(tag, rows)
+
+
+def _write(tag, rows, aborted_at=None):
     rows.sort(key=lambda r: (r["case"], r["repeat"]))
     summary = summarise(rows)
     OUT_DIR.mkdir(exist_ok=True)
-    (OUT_DIR / f"trajectory_{tag}.json").write_text(json.dumps({"summary": summary, "runs": rows}, indent=1))
+    data = {"summary": summary, "runs": rows}
+    if aborted_at:
+        data["aborted_at"] = aborted_at
+    (OUT_DIR / f"trajectory_{tag}.json").write_text(json.dumps(data, indent=1))
     (OUT_DIR / f"trajectory_{tag}.md").write_text(render(tag, summary, rows), encoding="utf-8")
     print(render(tag, summary, rows).split("## Runs")[0])
 
 
-def compare(before_tag, after_tag):
-    before = json.loads((OUT_DIR / f"trajectory_{before_tag}.json").read_text())["summary"]
-    after = json.loads((OUT_DIR / f"trajectory_{after_tag}.json").read_text())["summary"]
+def _load_summary(tag, repeat):
+    rows = json.loads((OUT_DIR / f"trajectory_{tag}.json").read_text())["runs"]
+    if repeat:
+        rows = [r for r in rows if r["repeat"] == repeat]
+    return summarise(rows)
+
+
+def compare(before_tag, after_tag, repeat=None, out="regression.md"):
+    before, after = _load_summary(before_tag, repeat), _load_summary(after_tag, repeat)
+    scope = f"repeat {repeat} only" if repeat else "all runs"
     lines = [f"# Regression check — {before_tag} -> {after_tag}", "",
+             f"Scope: {scope}; {before['runs']} runs before, {after['runs']} runs after, same cases.", "",
              "| failure mode | before | after | change |", "|---|---|---|---|"]
     for m in MODES:
         # A mode added to the taxonomy after a run was scored had no runs then (baseline had no errors).
@@ -231,7 +251,7 @@ def compare(before_tag, after_tag):
                    ("latency_p50_s", "{:.2f}"), ("latency_max_s", "{:.2f}")]:
         lines.append(f"| {k} | {fmt.format(before[k])} | {fmt.format(after[k])} |")
     text = "\n".join(lines) + "\n"
-    (OUT_DIR / "regression.md").write_text(text, encoding="utf-8")
+    (OUT_DIR / out).write_text(text, encoding="utf-8")
     print(text)
 
 
@@ -241,9 +261,11 @@ def main():
     p.add_argument("--repeats", type=int, default=3)
     p.add_argument("--only", nargs="*")
     p.add_argument("--compare", nargs=2, metavar=("BEFORE", "AFTER"))
+    p.add_argument("--repeat", type=int, help="with --compare: only compare this repeat")
+    p.add_argument("--out", default="regression.md", help="with --compare: output file name")
     args = p.parse_args()
     if args.compare:
-        compare(*args.compare)
+        compare(*args.compare, repeat=args.repeat, out=args.out)
     else:
         run_eval(args.tag, args.repeats, args.only)
 
