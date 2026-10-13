@@ -1,0 +1,16 @@
+diff --git a/hr_agent/tools.py b/hr_agent/tools.py
+index 73dc1ec..17613e1 100644
+--- a/hr_agent/tools.py
++++ b/hr_agent/tools.py
+@@ -100,7 +100,10 @@ TOOL_SCHEMAS = [
+             "name": "search_handbook",
+             "description": "Keyword search over the handbook's general policy clauses (HB-1 to HB-6: "
+                            "tenure, transfers, contractors, carry-over, probation, part-time) and return "
+-                           "the matching clause text. Contains no per-jurisdiction entitlement amounts.",
++                           "the matching clause text. These clauses are the only source for adjusting a "
++                           "table value: remaining balance with carry-over (HB-4), part-time pro-rating "
++                           "(HB-6), transfers (HB-2) and contractors (HB-3). Contains no per-jurisdiction "
++                           "entitlement amounts.",
+             "parameters": {
+                 "type": "object",
+                 "properties": {

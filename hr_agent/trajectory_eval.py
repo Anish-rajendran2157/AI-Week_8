@@ -37,7 +37,9 @@ MODES = {
     "unsupported_citation": "final rule_id is real but never appeared in any tool result of the run",
     "redundant_call": "duplicate call, or a call outside every accepted path",
     "order_violation": "right calls, but in an order no accepted path allows",
-    "no_answer": "budget fired, error, or output broke the contract",
+    "malformed_tool_call": "provider rejected a tool call the model emitted (e.g. a tool name with a "
+                           "leaked '<|channel|>' token, HTTP 400 tool_use_failed); the run ends with no answer",
+    "no_answer": "budget fired, other error, or output broke the contract",
     "wrong_answer": "final value does not match the expected value (outcome failure)",
 }
 
@@ -75,7 +77,9 @@ def score_run(case, run) -> dict:
     modes = set()
 
     outcome_pass = run["status"] == "ok" and abs(answer.get("value", float("nan")) - case.expected_value) < 0.01
-    if run["status"] != "ok":
+    if run["status"] == "error" and "tool_use_failed" in (run.get("error") or ""):
+        modes.add("malformed_tool_call")
+    elif run["status"] != "ok":
         modes.add("no_answer")
     elif not outcome_pass:
         modes.add("wrong_answer")
@@ -128,7 +132,7 @@ def score_run(case, run) -> dict:
         "steps": len(calls), "steps_needed": case.steps_needed,
         "step_efficiency": len(calls) / case.steps_needed,
         "modes": sorted(modes), "cost_usd": run["cost_usd"], "total_tokens": run["total_tokens"],
-        "latency_s": run["latency_s"], "laps": run["laps"],
+        "latency_s": run["latency_s"], "laps": run["laps"], "error": run.get("error"),
         "path": [f"{c['tool']}({c['raw']})" for c in calls],
     }
 
@@ -214,7 +218,8 @@ def compare(before_tag, after_tag):
     lines = [f"# Regression check — {before_tag} -> {after_tag}", "",
              "| failure mode | before | after | change |", "|---|---|---|---|"]
     for m in MODES:
-        b, a = before["mode_counts"][m], after["mode_counts"][m]
+        # A mode added to the taxonomy after a run was scored had no runs then (baseline had no errors).
+        b, a = before["mode_counts"].get(m, 0), after["mode_counts"].get(m, 0)
         flag = "**worse**" if a > b else ("better" if a < b else "same")
         lines.append(f"| {m} | {b} | {a} | {flag} |")
     lines += ["", "| metric | before | after |", "|---|---|---|"]

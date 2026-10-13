@@ -70,10 +70,10 @@ def run_agent(question: str, budget: Budget = None) -> dict:
     laps = 0
     log.info("START question=%r budget=%s", question, asdict(budget))
 
-    def finish(status, answer=None):
+    def finish(status, answer=None, error=None):
         wall = time.perf_counter() - start
         result = {"status": status, "answer": answer, "laps": laps, "tool_calls": tool_trace,
-                  "trajectory": trajectory,
+                  "trajectory": trajectory, "error": error,
                   **{k: used[k] for k in zero}, "backoff_s": used["backoff_s"],
                   "latency_s": wall - used["backoff_s"]}
         log.info("END status=%s laps=%d tokens=%d cost=$%.6f latency=%.2fs",
@@ -94,7 +94,7 @@ def run_agent(question: str, budget: Budget = None) -> dict:
             return finish("budget:wall_clock")
         except APIError as e:
             log.error("LLM error on lap %d: %s", laps + 1, e)
-            return finish("error")
+            return finish("error", error=str(e)[:500])
 
         laps += 1
         for k in zero:
